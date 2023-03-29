@@ -1,87 +1,94 @@
-import axios from 'axios';  
-import {
-    useNavigate 
-  } from "react-router-dom";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-import React, { useState } from 'react'  
+import React, { useState } from "react";
+import { useAuth } from "./AuthContext";
 
+const Login = () => {
+  let navigate = useNavigate();
+  const { login } = useAuth();
 
-const Login=()=>{
-    let navigate = useNavigate();
+  const [user, setUser] = useState({ email: "", password: "" });
 
-    const [user,setUser]=useState({email:'',paasword:''})
+  const handleChange = (e) => {
+    setUser({ ...user, [e.target.name]: e.target.value });
+  };
 
-    const handleChange=(e)=>{
-        setUser({...user, [e.target.name]: e.target.value}); 
-    }
+  const submitForm = (e) => {
+    e.preventDefault();
+    const sendData = {
+      email: user.email,
+      password: user.password,
+    };
 
+    // console.log(sendData);
 
-    const submitForm=(e)=>{
+    axios
+      .post("http://localhost/php-react/signup-signin/login.php", sendData)
+      .then((result) => {
+        if (result.data.Status === "200") {
+          //   window.localStorage.setItem("email", result.data.email);
+          //   window.localStorage.setItem(
+          //     "userName",
+          //     result.data.first_name + " " + result.data.last_name
+          //   );
+          login({ email: result.data.email, userName: result.data.last_name });
 
-        e.preventDefault(); 
-       const sendData = {
-        
-            email:user.email,
-            password:user.password
+          navigate(`/dashboard`);
+        } else {
+          //props.history.push('/Dashboard')
+          //props.history.push('/Dashboard') Redirect
 
+          alert("Invalid User");
         }
+      });
+  };
 
-       // console.log(sendData);
-
-        axios.post('http://localhost/php-react/signup-signin/login.php',sendData)
-        .then((result)=>{
-            if (result.data.Status === '200') { 
-                window.localStorage.setItem('email', result.data.email);
-                window.localStorage.setItem('userName', (result.data.first_name+ ' ' +result.data.last_name ));  
-              
-                
-
-                navigate(`/dashboard`);
-            }
-        else  {
-           //props.history.push('/Dashboard')  
-           //props.history.push('/Dashboard') Redirect
-           
-           alert('Invalid User'); 
-        }
-      })  
-    }
-
-
-    return(
-      
-        <form onSubmit={submitForm}>
-        <div className="main-box">
+  return (
+    <form onSubmit={submitForm}>
+      <div className="main-box">
         <div className="row">
-             <div className="col-md-12 text-center"> <h1>Login Page</h1></div>
+          <div className="col-md-12 text-center">
+            {" "}
+            <h1>Login Page</h1>
+          </div>
         </div>
         <div className="row">
-           <div className="col-md-6">Email:</div>
-           <div className="col-md-6"><input typs="email" name="email"  
-           onChange={handleChange} value={user.email} /></div>
+          <div className="col-md-6">Email:</div>
+          <div className="col-md-6">
+            <input
+              typs="email"
+              name="email"
+              onChange={handleChange}
+              value={user.email}
+            />
+          </div>
         </div>
         <div className="row">
-           <div className="col-md-6">Password:</div>
-           <div className="col-md-6"><input typs="password" name="password"
-            onChange={handleChange} value={user.password}
-            /></div>
+          <div className="col-md-6">Password:</div>
+          <div className="col-md-6">
+            <input
+              typs="password"
+              name="password"
+              onChange={handleChange}
+              value={user.password}
+            />
+          </div>
         </div>
-
 
         <div className="row">
-           <div className="col-md-12 text-center">
-               <input type="submit" name="submit"  className="btn btn-success" value="Plese Login" />
-           </div>
-           
+          <div className="col-md-12 text-center">
+            <input
+              type="submit"
+              name="submit"
+              className="btn btn-success"
+              value="Plese Login"
+            />
+          </div>
         </div>
-        </div>
-       
-        </form>
-        
-        
-           
-           
-    )
-}
+      </div>
+    </form>
+  );
+};
 
 export default Login;
